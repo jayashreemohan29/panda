@@ -82,13 +82,13 @@ static void panda_args_set_help_wanted(const char *);
 
 bool panda_load_plugin(const char *filename, const char *plugin_name) {
     // don't load the same plugin twice
-    uint32_t i;
-    for (i=0; i<nb_panda_plugins_loaded; i++) {
+    //uint32_t i;
+    /*for (i=0; i<nb_panda_plugins_loaded; i++) {
         if (0 == (strcmp(filename, panda_plugins_loaded[i]))) {
             fprintf(stderr, PANDA_MSG_FMT "%s already loaded\n", PANDA_CORE_NAME, filename);
             return true;
         }
-    }    
+    }*/    
     // NB: this is really a list of plugins for which we have started loading 
     // and not yet called init_plugin fn.  needed to avoid infinite loop with panda_require  
     panda_plugins_loaded[nb_panda_plugins_loaded] = strdup(filename);
@@ -937,12 +937,14 @@ void hmp_panda_load_plugin(Monitor *mon, const QDict *qdict) {
     bool has_file_name   = file_name ? true : false;
     bool has_plugin_args = plugin_args ? true : false;
     qmp_load_plugin(has_file_name, file_name, plugin_name, has_plugin_args, plugin_args, &err);
+    monitor_printf(mon, "cmEOF");
 }
 
 void hmp_panda_unload_plugin(Monitor *mon, const QDict *qdict) {
     Error *err;
     const int index = qdict_get_try_int(qdict, "index", -1);
     qmp_unload_plugin(index, &err);
+    monitor_printf(mon, "cmEOF");
 }
 
 void hmp_panda_list_plugins(Monitor *mon, const QDict *qdict) {
@@ -955,6 +957,7 @@ void hmp_panda_list_plugins(Monitor *mon, const QDict *qdict) {
         plugin_item = plugin_item->next;
 
     }
+    monitor_printf(mon, "cmEOF");
 }
 
 void hmp_panda_plugin_cmd(Monitor *mon, const QDict *qdict) {

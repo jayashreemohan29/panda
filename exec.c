@@ -66,6 +66,7 @@
 
 #include <zlib.h>
 #include "panda/callback_support.h"
+#include <inttypes.h>
 
 //#define DEBUG_SUBPAGE
 
@@ -2658,6 +2659,11 @@ static MemTxResult address_space_write_continue(AddressSpace *as, hwaddr addr,
 
     for (;;) {
         if (!memory_access_is_direct(mr, true)) {
+	    /*printf("\nIndirect mem access : ");
+            printf("%" PRIu64 "\t", addr1);
+            printf("%" PRIu64 "\t", l);
+            printf("%p\t", (void*)buf);
+            printf("%" PRIu64 "\n", addr);*/
             release_lock |= prepare_mmio_access(mr);
             l = memory_access_size(mr, l, addr1);
             /* XXX: could force current_cpu to NULL to avoid
@@ -2713,6 +2719,11 @@ static MemTxResult address_space_write_continue(AddressSpace *as, hwaddr addr,
             }
         } else {
             /* RAM case */
+	    /*printf("\nDirect mem access : ");
+            printf("%" PRIu64 "\t", addr1);
+            printf("%" PRIu64 "\t", l);
+            printf("%p\t", (void*)buf);
+            printf("%" PRIu64 "\n", addr);*/
             ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
             if (rr_in_record() && (rr_record_in_progress || rr_record_in_main_loop_wait)) {
                 // We should record the memory address relative to the address space, not physical memory.
